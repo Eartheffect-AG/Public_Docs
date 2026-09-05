@@ -47,6 +47,8 @@ Konzeptdokument Block A):
 | Projektphase liess sich nie speichern, immer "Konzept" | Kein Formularfeld + Query-Parameter-Default überschrieb den DB-Wert immer | Feld ergänzt, Default-Logik korrigiert |
 | Grösseneinheit optional trotz gesetzter Referenzgrösse | Keine Validierung | Server-seitige Pflichtprüfung ergänzt |
 | Neue Kühlraum-Standardgeräte defaulteten auf "Hoch/Effizient" | Falscher Default im Admin-Formular | Auf "Mittel/Standard" korrigiert |
+| Irreführender Wert "0.005 kWh/Einheit/Tag" bei Lüftungsanlage | Toter Datenwert seit Umstellung auf SFP-basierte Berechnung (15.07.), nie bereinigt | Wert auf NULL gesetzt, Anzeige zeigt jetzt den echten SFP-Standardwert |
+| "Tiefkühlraum mit Aussentür" 16.7× höher als normaler Tiefkühlraum (15.5 statt plausibel 1.55 kWh/m³/Tag) | Vermuteter Zahlendreher in den Katalogdaten | Auf 1.55 korrigiert |
 
 **Drei Regressionen, jeweils noch am selben Tag behoben:**
 - `UnboundLocalError` beim Gerät-Hinzufügen für Kühlräume/Lüftung (Nebenwirkung
@@ -132,6 +134,21 @@ Konzeptdokument Block A):
 **Kursanleitung**
 - Die Planer-Anleitung im Tool ("So funktioniert's") wurde vollständig um
   alle oben genannten neuen Funktionen ergänzt.
+
+**Planer-Feedback & Admin-Dashboard** (auf Wunsch, ausserhalb des Testberichts)
+- Planer können jederzeit einen **Verbesserungsvorschlag** einreichen
+  (Link "💡 Vorschlag" im Menü) oder direkt auf der Geräteseite ein
+  **fehlendes Gerät/eine fehlende Kategorie beantragen** (Link "🔧
+  Gerät/Kategorie fehlt? Beantragen", mit vorausgefülltem Kontext).
+- Beides löst automatisch eine **E-Mail an info@ecogastro.org** aus
+  (fail-soft: der Eintrag bleibt auch bei einem SMTP-Fehler gespeichert)
+  und erscheint im neuen **Admin-Posteingang** (`/admin/feedback`) mit
+  Status (neu/gesehen/erledigt) und interner Notiz.
+- **Admin-Dashboard erweitert:** Live-Zähler offener Vorschläge/Anfragen,
+  neue Sektion "Planer-Übersicht" (Projekte/Objekte/Geräte pro Planer,
+  letzter Login, neuestes Projekt) plus Balkendiagramm "Neue Projekte pro
+  Monat" (letzte 12 Monate). Nur für Admins sichtbar, das normale
+  Planer-Dashboard bleibt unverändert.
 
 ## 6. Korrekturen im Verlauf (auf Rückmeldung angepasst)
 
