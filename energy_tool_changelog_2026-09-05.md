@@ -1,7 +1,7 @@
-# Changelog: Testbericht-Umsetzung EnergyCalc — 04.–05.09.2026
+# Changelog: Testbericht-Umsetzung EnergyCalc — 05.09.2026
 
-Saubere, chronologisch nachvollziehbare Zusammenfassung aller Änderungen der
-letzten 24 Stunden. Ausgangspunkt war die Auswertung des Testberichts
+Saubere, chronologisch nachvollziehbare Zusammenfassung aller Änderungen.
+Ausgangspunkt war die Auswertung des Testberichts
 `260904_Testbericht_Tool_EnergyCalc.docx`; im Verlauf kamen einige zusätzlich
 gewünschte Funktionen dazu. Für die vollständige Nachverfolgung jedes
 einzelnen der ~30 ursprünglichen Testbericht-Punkte (inkl. Diskussion,
@@ -33,7 +33,7 @@ Konzeptdokument Block A):
 - Systemgrenze/Messvergleich: methodische Anmerkung, kein Feature.
 - Projekte bleiben 1 Planer = 1 Zugriff.
 - Firmenwechsel eines Planers: entspricht bereits dem Ist-Zustand.
-- **Beleuchtung** wird als neues Gewerk aufgenommen (noch nicht implementiert).
+- **Beleuchtung** als neues Gewerk aufgenommen und umgesetzt (siehe Abschnitt 5).
 - Gastroplaner darf Lüftung/Kälte weiterhin berechnen, mit Pflicht-Disclaimer.
 - Bei Zentralkühlung erfasst der Gastroplaner nur EK-Angaben, klar markiert
   (→ siehe ZK/EK-Kennzeichnung unten).
@@ -48,14 +48,32 @@ Konzeptdokument Block A):
 | Grösseneinheit optional trotz gesetzter Referenzgrösse | Keine Validierung | Server-seitige Pflichtprüfung ergänzt |
 | Neue Kühlraum-Standardgeräte defaulteten auf "Hoch/Effizient" | Falscher Default im Admin-Formular | Auf "Mittel/Standard" korrigiert |
 
-**Zwei Regressionen, noch am selben Tag behoben:**
+**Drei Regressionen, jeweils noch am selben Tag behoben:**
 - `UnboundLocalError` beim Gerät-Hinzufügen für Kühlräume/Lüftung (Nebenwirkung
-  des EcoGastro-Alternative-Hinweises, Var. nur bedingt initialisiert).
+  des EcoGastro-Alternative-Hinweises, Variable nur bedingt initialisiert).
 - Katalog-Gruppen-Filter zeigte nichts an, weil der Kategoriename im
   Formular-**Feldnamen** kodiert war statt im Wert — Sonderzeichen/Umlaute
   wurden dabei inkonsistent dekodiert.
+- Derselbe Bugtyp (Variable nur bedingt initialisiert) trat beim Bau der
+  Beleuchtungs-Funktion erneut auf und legte kurzzeitig alle 6 Gerätetabs lahm.
 
 ## 5. Neue Funktionen
+
+**Beleuchtung als neues Gewerk**
+- Neuer Tab **💡 Beleuchtung**, positioniert zwischen Kühlräume und Lüftung.
+- Berechnung: `Fläche (m²) × spezifische Anschlussleistung (W/m²) ×
+  Betriebsstunden/Tag × Betriebstage/Jahr` — nach **SIA 387/4** (aktuelle
+  Norm, hat die ältere SIA 380/4 abgelöst) i.V.m. **SIA 2024**
+  (Standard-Nutzungsbedingungen für Energie- und Gebäudetechnik).
+- W/m² und Betriebsstunden/Tag sind bewusst **freie Eingabefelder** für den
+  Planer, kein automatisch nachgeschlagener Normwert — die konkreten
+  SIA-2024-Tabellenwerte für die Raumnutzung "Küche/Gastronomie" liegen
+  hinter der kostenpflichtigen Norm und wurden hier nicht erfunden.
+- Neue Admin-Einstellungsseite für Vorschlagswerte (aktuell leer), die beim
+  Erfassen eines Beleuchtungs-Geräts als Default vorausgefüllt werden, aber
+  pro Gerät überschreibbar bleiben.
+- Noch kein Vergleichsgerät-/Einsparungsmodell für Beleuchtung definiert —
+  vorerst reine Verbrauchsberechnung ohne ausgewiesene Einsparung.
 
 **Geräte-Referenz & IDs**
 - Stabile Geräte-Referenz `Projekt-ID_Objekt-ID_Geräte-Nr.`, sichtbar in der
@@ -111,6 +129,10 @@ Konzeptdokument Block A):
   Unterkategorie zugeordneten Kategorien ein (bei Wechsel wird die
   Kategorie-Auswahl zurückgesetzt, um widersprüchliche Filter zu vermeiden).
 
+**Kursanleitung**
+- Die Planer-Anleitung im Tool ("So funktioniert's") wurde vollständig um
+  alle oben genannten neuen Funktionen ergänzt.
+
 ## 6. Korrekturen im Verlauf (auf Rückmeldung angepasst)
 
 Zwei Punkte wurden zunächst anders gebaut, als gewünscht, und danach korrigiert:
@@ -138,39 +160,12 @@ Zwei Punkte wurden zunächst anders gebaut, als gewünscht, und danach korrigier
   Migration + Admin-UI).
 - Prozessbasierter Gerätevergleich (Version 2, `usage_h*`-Felder).
 
-## 9a. Nachträglich ergänzt (05.09.2026): Beleuchtung als neues Gewerk
-
-Ursprünglich unter Block A (A4) nur als Grundsatzentscheid festgehalten,
-noch nicht gebaut — auf Nachfrage umgesetzt:
-
-- Neuer Tab **💡 Beleuchtung**, positioniert zwischen Kühlräume und Lüftung.
-- Berechnung: `Fläche (m²) × spezifische Anschlussleistung (W/m²) ×
-  Betriebsstunden/Tag × Betriebstage/Jahr` — nach **SIA 387/4** (aktuelle
-  Norm, hat die ältere SIA 380/4 abgelöst) i.V.m. **SIA 2024**
-  (Standard-Nutzungsbedingungen für Energie- und Gebäudetechnik).
-- **W/m² und Betriebsstunden/Tag sind bewusst freie Eingabefelder für den
-  Planer**, kein automatisch nachgeschlagener Normwert — die konkreten
-  SIA-2024-Tabellenwerte für die Raumnutzung "Küche/Gastronomie" liegen
-  hinter der kostenpflichtigen Norm und wurden hier nicht erfunden.
-- Neue Admin-Einstellungsseite `/settings/lighting` für Vorschlagswerte
-  (aktuell leer), die beim Erfassen eines Beleuchtungs-Geräts als Default
-  vorausgefüllt werden, aber pro Gerät überschreibbar bleiben.
-- Noch **kein Vergleichsgerät-/Einsparungsmodell** für Beleuchtung definiert
-  (A4 sah das nur als "Detailkonzept bei Umsetzung" vor) — vorerst reine
-  Verbrauchsberechnung ohne ausgewiesene Einsparung.
-- **Regression während der Umsetzung, im selben Zug behoben:** gleicher
-  Bugtyp wie beim E2-Fix (`UnboundLocalError` durch eine nur bedingt
-  initialisierte Variable) — betraf kurzzeitig alle 6 Gerätetabs, nicht nur
-  Beleuchtung. Alle Tabs danach erneut getestet.
-- Getestet End-to-End: Admin-Default setzen → erscheint als Vorschlag im
-  Formular → Gerät anlegen (50 m² × 12 W/m² × 10 h/Tag × 300 Tage =
-  1800 kWh/Jahr, rechnerisch korrekt) → Bearbeiten-Ansicht zeigt die
-  gespeicherten Werte.
-
 ## 9. Offen (braucht Martins Input)
 
 - Fehlende Spülmaschinen-Werte im Katalog — kein Zugriff auf die Live-
   Produktionsdatenbank von hier aus möglich.
+- Reale SIA-2024-Tabellenwerte (W/m², Betriebsstunden/Tag) für die
+  Beleuchtungsberechnung, falls Zugriff auf die Norm besteht.
 
 ---
 
